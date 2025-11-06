@@ -2,6 +2,7 @@ import joblib
 from lightgbm import LGBMClassifier
 import common
 from sklearn.model_selection import RandomizedSearchCV
+import config
 
 X_train, X_test, y_train, y_test = common.load_dataset()
 
@@ -28,12 +29,12 @@ if TRAIN:
     random_search = RandomizedSearchCV(
         estimator=base_model,
         param_distributions=param_dist,
-        n_iter=10, 
-        cv=3, 
+        n_iter=config.CANDIDATE_AMOUNT, 
+        cv=config.CV_COUNT, 
         scoring=common.my_scorer,
-        random_state=43, 
+        random_state=config.TRAIN_SEED, 
         n_jobs=-1,
-        verbose=1
+        verbose=2
     )
     
     # apparently the override doesn't go inside the function
@@ -48,12 +49,12 @@ if TRAIN:
     
     # print = old_print
     
-    joblib.dump(best_model, "lightgbm_model_43.joblib")
+    joblib.dump(best_model, f"lightgbm_model_{config.TRAIN_SEED}.joblib")
     print(f"best parameters: {random_search.best_params_}")
     print(f"Best F{common.BETA}-score during search: {random_search.best_score_:.4f}")
     
 else:
-    best_model = joblib.load("lightgbm_model._43joblib")
+    best_model = joblib.load(f"lightgbm_model._{config.TRAIN_SEED}joblib")
 
 y_pred = best_model.predict_proba(X_test)
 fraud_probs = y_pred[:, 1]

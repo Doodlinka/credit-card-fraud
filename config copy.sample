@@ -1,0 +1,5 @@
+# earliest taken: 42
+# latest taken: 44
+TRAIN_SEED = 45
+CV_COUNT = 3
+CANDIDATE_AMOUNT = 20
