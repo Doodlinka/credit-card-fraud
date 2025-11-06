@@ -1,0 +1,16 @@
+default parameters
+Best F10-Score: 0.8942
+Optimal Threshold: 0.0272
+--- Classification Report for threshold 0.02722606163470661---
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     56864       
+           1       0.63      0.89      0.73        98       
+
+    accuracy                           1.00     56962       
+   macro avg       0.81      0.94      0.87     56962       
+weighted avg       1.00      1.00      1.00     56962       
+
+--- Confusion Matrix ---
+[[56812    52]
+ [   11    87]]
