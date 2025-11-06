@@ -27,7 +27,7 @@ else:
 y_pred = model.predict_proba(X_test)
 fraud_probs = y_pred[:, 1]
 
-BETA = 10 # cost of missing a fraud compared to false alarm
+BETA = 50 # cost of missing a fraud compared to false alarm
 
 precisions, recalls, thresholds = precision_recall_curve(y_test, fraud_probs)
 # 1e-10 just in case of 0 division
