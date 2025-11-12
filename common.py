@@ -71,13 +71,15 @@ def crossvalidate(model_constructor, X_train, y_train, static_parameters, tuned_
 
     print("\n--- CV Results ---")
     print(f"Tested Params: {tuned_parameters}")
-    print(f"Average F2-Score across {config.CV_COUNT} folds: {avg_score:.4f}")
+    print(f"Average F-Score across {config.CV_COUNT} folds: {avg_score:.4f}")
     print(f"Average optimal tree count: {avg_trees:.0f}")
     return ensemble
     
 
 def print_best_threshold(y_test, fraud_probs):
     precisions, recalls, thresholds = precision_recall_curve(y_test, fraud_probs)
+    # there's a phantom point at the end, apparently
+    precisions, recalls = precisions[:-1], recalls[:-1]
     # 1e-10 just in case of 0 division
     # yeah, i'm still using my own, because that one can't mix yes/no and probabilities
     # precisions and recalls are added AND MULTIPILED element-wise here
@@ -87,10 +89,15 @@ def print_best_threshold(y_test, fraud_probs):
     best_threshold = thresholds[best_score_index]
 
     print(f"--- F{BETA}-Score Optimization ---")
-    print(f"Best F{BETA}-Score: {f_beta_scores[best_score_index]:.4f}")
+    # this seems innaccurate
+    # print(f"Best F{BETA}-Score: {f_beta_scores[best_score_index]:.4f}")
     print(f"Optimal Threshold: {best_threshold:.4f}")
 
     y_final_pred = (fraud_probs > best_threshold).astype(int)
+
+    crdict = classification_report(y_test, y_final_pred, output_dict=True)
+    fb = (1 + BETA**2) * (crdict["1"]["precision"] * crdict["1"]["recall"]) / ((BETA**2 * crdict["1"]["precision"]) + crdict["1"]["recall"] + 1e-10)
+    print(f"Best F{BETA}-Score as per the matrix: {fb:.4f}")
 
     print(f"--- Classification Report for threshold {best_threshold:.4f}---")
     print(classification_report(y_test, y_final_pred))

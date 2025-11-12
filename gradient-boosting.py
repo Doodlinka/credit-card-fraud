@@ -19,13 +19,13 @@ if TRAIN:
         "verbose": -1,
     }
     
-    # gbdt record: 0.9260
+    # record: 0.8748 (12/28)
     # other parameters either had no effect or are best left default
     tuned_parameters = {
-        "learning_rate": 0.05,
-        "colsample_bytree": 0.7,
-        "num_leaves": 40,
-        # "min_sum_hessian_in_leaf": 2e-3,
+        # "num_estimators": 100,
+        "learning_rate": 0.06, # fixed 0.06
+        "colsample_bytree": 0.3, # fixed 0.3
+        "num_leaves": 56, # fixed 56
     }
     # this is super important too
     callbacks = [early_stopping(stopping_rounds=50, verbose=False)]
@@ -50,7 +50,7 @@ if TRAIN:
     print(ensemble[0].get_params())
     
 else:
-    ensemble = joblib.load("lgbm_ensemble.joblib")
+    ensemble = joblib.load("lgbm_ensemble_1.joblib")
     print(f"Loaded ensemble of {config.CV_COUNT} models with following params:")
     print(ensemble[0].get_params())
 

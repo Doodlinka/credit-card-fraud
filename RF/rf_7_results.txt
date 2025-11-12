@@ -1,6 +1,6 @@
 --- F7.1-Score Optimization ---
-Best F7.1-Score: 0.8841
 Optimal Threshold: 0.0700
+Best F7.1-Score as per the matrix: 0.875293
 --- Classification Report for threshold 0.0700---  
               precision    recall  f1-score   support
 
