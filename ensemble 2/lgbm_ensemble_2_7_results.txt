@@ -1,0 +1,17 @@
+e': 61, 'reg_alpha': 0.0, 'reg_lambda': 0.0, 'subsample': 1.0, 'subsample_for_bin': 200000, 'subsample_freq': 0, 'verbose': -1}
+--- F7.1-Score Optimization ---
+Best F7.1-Score: 0.8663
+Optimal Threshold: 0.2658
+--- Classification Report for threshold 0.2658---  
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     56864
+           1       0.39      0.88      0.54        98
+
+    accuracy                           1.00     56962
+   macro avg       0.69      0.94      0.77     56962
+weighted avg       1.00      1.00      1.00     56962
+
+--- Confusion Matrix ---
+[[56728   136]
+ [   12    86]]

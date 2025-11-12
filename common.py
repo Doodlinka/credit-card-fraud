@@ -9,16 +9,20 @@ def load_dataset():
     df = pd.read_csv("v132_creditcard.csv")
 
     X = df.drop("Class", axis=1)
+    # print("avg tansaction amouont: ", np.mean(X["Amount"]))
     y = df["Class"]
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 
         test_size=0.2, 
-        random_state=42)
+        random_state=config.TT_SPLIT_SEED)
     
     return X_train, X_test, y_train, y_test
 
-BETA = 50
+
+# turns out beta SQUARED is the ratio of fn cost to fp cost
+# i guesstimated it to be 50
+BETA = 7.1
 
 my_scorer = make_scorer(fbeta_score, greater_is_better=True, beta=BETA)
 
@@ -31,9 +35,10 @@ def my_lgbm_format_scorer(y_true, y_pred_probs):
     return (f'f{BETA}', score, True)
 
 def crossvalidate(model_constructor, X_train, y_train, static_parameters, tuned_parameters, callbacks):
-    skf = StratifiedKFold(n_splits=config.CV_COUNT, shuffle=True, random_state=42)
+    skf = StratifiedKFold(n_splits=config.CV_COUNT, shuffle=True, random_state=config.CV_SPLIT_SEED)
     best_tree_counts = []
     fold_scores = []
+    ensemble = []
     
     for fold_n, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
         print(f"--- Fold {fold_n + 1}/{config.CV_COUNT} ---")
@@ -50,6 +55,7 @@ def crossvalidate(model_constructor, X_train, y_train, static_parameters, tuned_
             eval_metric=my_lgbm_format_scorer,
             callbacks=callbacks
         )
+        ensemble.append(model)
 
         best_trees = model.best_iteration_
         best_score = model.best_score_['valid_0'][f'f{BETA}']
@@ -67,6 +73,7 @@ def crossvalidate(model_constructor, X_train, y_train, static_parameters, tuned_
     print(f"Tested Params: {tuned_parameters}")
     print(f"Average F2-Score across {config.CV_COUNT} folds: {avg_score:.4f}")
     print(f"Average optimal tree count: {avg_trees:.0f}")
+    return ensemble
     
 
 def print_best_threshold(y_test, fraud_probs):

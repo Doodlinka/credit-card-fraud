@@ -1,0 +1,18 @@
+Loaded ensemble of 4 models with following params:
+{'boosting_type': 'gbdt', 'class_weight': 'balanced', 'colsample_bytree': 0.7, 'importance_type': 'split', 'learning_rate': 0.05, 'max_depth': -1, 'min_child_samples': 20, 'min_child_weight': 0.001, 'min_split_gain': 0.0, 'n_estimators': 100, 'n_jobs': -1, 'num_leaves': 60, 'objective': None, 'random_state': 61, 'reg_alpha': 0.0, 'reg_lambda': 0.0, 'subsample': 1.0, 'subsample_for_bin': 200000, 'subsample_freq': 0, 'verbose': -1}
+--- F7.1-Score Optimization ---
+Best F7.1-Score: 0.8634
+Optimal Threshold: 0.4436
+--- Classification Report for threshold 0.4436---  
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     56864
+           1       0.70      0.86      0.77        98
+
+    accuracy                           1.00     56962
+   macro avg       0.85      0.93      0.89     56962
+weighted avg       1.00      1.00      1.00     56962
+
+--- Confusion Matrix ---
+[[56828    36]
+ [   14    84]]

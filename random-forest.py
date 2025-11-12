@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_curve
 import joblib
+import common
 
 df = pd.read_csv("v132_creditcard.csv")
 
@@ -26,24 +27,4 @@ else:
 
 y_pred = model.predict_proba(X_test)
 fraud_probs = y_pred[:, 1]
-
-BETA = 50 # cost of missing a fraud compared to false alarm
-
-precisions, recalls, thresholds = precision_recall_curve(y_test, fraud_probs)
-# 1e-10 just in case of 0 division
-f_beta_scores = (1 + BETA**2) * (precisions * recalls) / ((BETA**2 * precisions) + recalls + 1e-10)
-
-best_score_index = np.argmax(f_beta_scores)
-best_threshold = thresholds[best_score_index]
-
-print(f"--- F{BETA}-Score Optimization ---")
-print(f"Best F{BETA}-Score: {f_beta_scores[best_score_index]:.4f}")
-print(f"Optimal Threshold: {best_threshold:.4f}")
-
-y_final_pred = (fraud_probs > best_threshold).astype(int)
-
-print(f"--- Classification Report for threshold {best_threshold}---")
-print(classification_report(y_test, y_final_pred))
-
-print("--- Confusion Matrix ---")
-print(confusion_matrix(y_test, y_final_pred))
+common.print_best_threshold(y_test, fraud_probs)
