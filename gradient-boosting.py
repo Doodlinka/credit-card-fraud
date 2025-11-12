@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = common.load_dataset()
 
-TRAIN = False
+TRAIN = True
 
 if TRAIN:
     
@@ -48,15 +48,11 @@ if TRAIN:
     joblib.dump(ensemble, "lgbm_ensemble.joblib")
     print(f"Saved ensemble of {config.CV_COUNT} models with following params:")
     print(ensemble[0].get_params())
-#     # print(f"best parameters: {random_search.best_params_}")
-#     # print(f"Best F{common.BETA}-score during search: {random_search.best_score_:.4f}")
     
 else:
-    # ensemble = joblib.load("lgbm_ensemble.joblib")
-    model = joblib.load("lightgbm_miracle.joblib")
-    # print(f"Loaded ensemble of {config.CV_COUNT} models with following params:")
-    print(model.get_params())
-#     # best_model = joblib.load(f"lightgbm_model._{config.TRAIN_SEED}joblib")
+    ensemble = joblib.load("lgbm_ensemble.joblib")
+    print(f"Loaded ensemble of {config.CV_COUNT} models with following params:")
+    print(ensemble[0].get_params())
 
 all_fraud_probs = []
 for model in ensemble:
