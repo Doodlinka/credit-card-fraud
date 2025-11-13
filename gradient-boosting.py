@@ -12,23 +12,22 @@ TRAIN = True
 
 if TRAIN:
     
-    static_parameters = {
-        "class_weight": 'balanced',
-        "random_state": config.TRAIN_SEED,
-        "n_jobs": -1,
-        "verbose": -1,
-    }
+    # static_parameters = {
+    #     "class_weight": 'balanced',
+    #     "random_state": config.TRAIN_SEED,
+    #     "n_jobs": -1,
+    #     "verbose": -1,
+    # }
     
-    # record: 0.8748 (12/28)
-    # other parameters either had no effect or are best left default
-    tuned_parameters = {
-        # "num_estimators": 100,
-        "learning_rate": 0.06, # fixed 0.06
-        "colsample_bytree": 0.3, # fixed 0.3
-        "num_leaves": 56, # fixed 56
-    }
-    # this is super important too
-    callbacks = [early_stopping(stopping_rounds=50, verbose=False)]
+    # # record: 0.8748 (12/28) (with CV seed 50)
+    # tuned_parameters = {
+    #     # "num_estimators": 100,
+    #     "learning_rate": 0.06, # fixed 0.06
+    #     "colsample_bytree": 0.3, # fixed 0.3
+    #     "num_leaves": 56, # fixed 56
+    # }
+    # # this is super important too
+    # callbacks = [early_stopping(stopping_rounds=50, verbose=False)]
     
     # split the dataset again so early stopping has stuff to check when to stop
     # X_train_final, X_val_final, y_train_final, y_val_final = train_test_split(
@@ -42,10 +41,34 @@ if TRAIN:
     # eval_metric=common.my_lgbm_format_scorer,
     # callbacks=callbacks)
     
+    static_parameters = {
+        "force_col_wise": True,
+        'class_weight': 'balanced',
+        'random_state': config.TRAIN_SEED, 
+        }
+    tuned_parameters = {
+        'boosting_type': 'dart',
+        'colsample_bytree': 1.0,
+        'importance_type': 'split',
+        'learning_rate': 0.1,
+        'max_depth': -1,
+        'min_child_samples': 20,
+        'min_child_weight': 0.001,
+        'min_split_gain': 0.0,
+        'n_estimators': 575, # best: 600?
+        'num_leaves': 31,
+        'reg_alpha': 0.0,
+        'reg_lambda': 0.0,
+        'subsample': 1.0,
+        'subsample_for_bin': 200000,
+        'subsample_freq': 0
+    }
+    callbacks = []
+    
     ensemble = common.crossvalidate(LGBMClassifier, X_train, y_train, static_parameters, tuned_parameters, callbacks)
     
 #     # joblib.dump(best_model, f"lightgbm_model_{config.TRAIN_SEED}.joblib")
-    joblib.dump(ensemble, "lgbm_ensemble.joblib")
+    joblib.dump(ensemble, "lgbm_dart_ensemble.joblib")
     print(f"Saved ensemble of {config.CV_COUNT} models with following params:")
     print(ensemble[0].get_params())
     

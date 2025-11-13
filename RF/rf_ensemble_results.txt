@@ -1,0 +1,17 @@
+(4 models)
+--- F7.1-Score Optimization ---
+Optimal Threshold: 0.0700
+Best F7.1-Score as per the matrix: 0.8746
+--- Classification Report for threshold 0.0700---  
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     56864
+           1       0.75      0.88      0.81        98
+
+    accuracy                           1.00     56962
+   macro avg       0.87      0.94      0.90     56962
+weighted avg       1.00      1.00      1.00     56962
+
+--- Confusion Matrix ---
+[[56835    29]
+ [   12    86]]

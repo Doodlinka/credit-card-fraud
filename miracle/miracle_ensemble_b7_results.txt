@@ -2,7 +2,7 @@ Loaded ensemble of 4 models with following params:
 {'boosting_type': 'dart', 'class_weight': 'balanced', 'colsample_bytree': 1.0, 'importance_type': 'split', 'learning_rate': 0.05, 'max_depth': -1, 'min_child_samples': 20, 'min_child_weight': 0.001, 'min_split_gain': 0.0, 'n_estimators': 1000, 'n_jobs': None, 'num_leaves': 31, 'objective': None, 'random_state': 42, 'reg_alpha': 0.0, 'reg_lambda': 0.0, 'subsample': 1.0, 'subsample_for_bin': 200000, 'subsample_freq': 0}
 --- F7.1-Score Optimization ---
 Optimal Threshold: 0.0343
-Best F7.1-Score as per the matrix: 0.874254
+Best F7.1-Score as per the matrix: 0.8743
 --- Classification Report for threshold 0.0343---  
               precision    recall  f1-score   support
 
