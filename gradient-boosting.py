@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = common.load_dataset()
 
-TRAIN = True
+TRAIN = False
 
 if TRAIN:
     
@@ -47,19 +47,18 @@ if TRAIN:
         'random_state': config.TRAIN_SEED, 
         }
     tuned_parameters = {
-        'boosting_type': 'dart',
-        'colsample_bytree': 1.0,
+        'boosting_type': 'dart', # fixed - tyring dart
+        'n_estimators': 600, # fixed - 575 or 600?
+        'learning_rate': 0.1, # fixed - 0.1
+        'num_leaves': 31, # fixed - 31
+        'colsample_bytree': 1,
+        'subsample': 1.0,
         'importance_type': 'split',
-        'learning_rate': 0.1,
-        'max_depth': -1,
         'min_child_samples': 20,
         'min_child_weight': 0.001,
         'min_split_gain': 0.0,
-        'n_estimators': 575, # best: 600?
-        'num_leaves': 31,
         'reg_alpha': 0.0,
         'reg_lambda': 0.0,
-        'subsample': 1.0,
         'subsample_for_bin': 200000,
         'subsample_freq': 0
     }
@@ -73,7 +72,7 @@ if TRAIN:
     print(ensemble[0].get_params())
     
 else:
-    ensemble = joblib.load("lgbm_ensemble_1.joblib")
+    ensemble = joblib.load("lgbm_dart_ensemble.joblib")
     print(f"Loaded ensemble of {config.CV_COUNT} models with following params:")
     print(ensemble[0].get_params())
 
@@ -81,6 +80,6 @@ all_fraud_probs = []
 for model in ensemble:
     y_pred = model.predict_proba(X_test)
     all_fraud_probs.append(y_pred[:, 1])
-avg_fraud_probs = np.mean(np.array(all_fraud_probs), axis=0)
+avg_fraud_probs = np.max(np.array(all_fraud_probs), axis=0)
 
 common.print_best_threshold(y_test, avg_fraud_probs)
