@@ -96,7 +96,8 @@ def print_best_threshold(y_test, fraud_probs):
     y_final_pred = (fraud_probs > best_threshold).astype(int)
 
     crdict = classification_report(y_test, y_final_pred, output_dict=True)
-    fb = (1 + BETA**2) * (crdict["1"]["precision"] * crdict["1"]["recall"]) / ((BETA**2 * crdict["1"]["precision"]) + crdict["1"]["recall"] + 1e-10)
+    one = "1" if "1" in crdict else "1.0"
+    fb = (1 + BETA**2) * (crdict[one]["precision"] * crdict[one]["recall"]) / ((BETA**2 * crdict[one]["precision"]) + crdict[one]["recall"] + 1e-10)
     print(f"Best F{BETA}-Score as per the matrix: {fb:.4f}")
 
     print(f"--- Classification Report for threshold {best_threshold:.4f}---")
