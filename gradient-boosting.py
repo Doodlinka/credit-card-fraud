@@ -3,7 +3,6 @@ from lightgbm import LGBMClassifier, early_stopping
 import common
 import numpy as np
 import config
-from sklearn.model_selection import train_test_split
 
 
 X_train, X_test, y_train, y_test = common.load_dataset()

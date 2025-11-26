@@ -2,12 +2,42 @@ import common, config
 import pandas as pd
 import numpy as np
 import torch
-import torch.nn as nn
 from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 from skorch import NeuralNetBinaryClassifier
+from skorch.callbacks import EarlyStopping, EpochScoring, Checkpoint, LoadInitState, LRScheduler
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+# from sklearn.metrics import fbeta_score, make_scorer
 import torch.optim as optim
 import joblib
+import random, os
+from NN_definition import FraudDetectorModule
+import torch.nn as nn
+
+def set_seed(seed=config.TRAIN_SEED):
+    """Sets the seed for reproducibility across all libraries."""
+    # 1. Python
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    
+    # 2. NumPy
+    np.random.seed(seed)
+    
+    # 3. PyTorch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) # if you use multi-GPU
+    
+    # 4. CU-DNN (The tricky part)
+    # This forces the GPU to use the exact same algorithm every time,
+    # even if a faster one exists. It might slow down training slightly.
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    print(f"Random seed set to {seed}")
+
+# for consistency's sake
+set_seed()
 
 
 df = pd.read_csv("v132_creditcard.csv")
@@ -29,61 +59,76 @@ X_test = X_test.to_numpy().astype(np.float32)
 y_train = y_train.to_numpy().astype(np.float32)
 y_test = y_test.to_numpy().astype(np.float32)
 
-class FraudDetectorModule(nn.Module):
-    def __init__(self, num_features=30):
-        super(FraudDetectorModule, self).__init__()
-        self.activation = nn.ReLU()
-
-        self.layer1 = nn.Linear(num_features, 60)
-        self.dropout1 = nn.Dropout(0.3)
-
-        self.layer2 = nn.Linear(60, 30)
-        self.dropout2 = nn.Dropout(0.3)
-
-        self.output = nn.Linear(30, 1)
-
-    def forward(self, x):
-        x = self.layer1(x)
-        x = self.activation(x)
-        x = self.dropout1(x)
-        
-        x = self.layer2(x)
-        x = self.activation(x)
-        x = self.dropout2(x)
-        
-        x = self.output(x)
-        return x
-
-TRAIN = False
+TRAIN = True
 if TRAIN:
+    X_train_tune, X_val, y_train_tune, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
+    )
+
+    CONFIG = {
+        'lr': 0.0020, # fixed: 0.0020 with the scheduler, 0.0010 without
+        'hidden_units': 50,      # (record: 50 - 0.8710)
+        'dropout': 0.3,           # <--- Overfitting control
+        'weight_decay': 0.0001,   # <--- L2 Regularization
+        'pos_weight_mult': 1.5,   # <--- Increase to boost Recall (1.0 = Default Balanced)
+        'max_epochs': 50,         # <--- Give it time to learn
+        'batch_size': 1024,       # <--- Speed vs Stability
+        'patience': 10,
+    }
+
     n_neg = (y_train == 0).sum()
     n_pos = (y_train == 1).sum()
-    pos_weight = torch.tensor(n_neg / n_pos) 
+    base_pos_weight = torch.tensor(n_neg / n_pos)
+    final_pos_weight = base_pos_weight * CONFIG['pos_weight_mult']
 
-    scikit_model = NeuralNetBinaryClassifier(
+    cp = Checkpoint(
+        monitor='valid_auc_best', 
+        fn_prefix='best_model_'
+    )
+    load_best = LoadInitState(checkpoint=cp)
+
+    net = NeuralNetBinaryClassifier(
         module=FraudDetectorModule,
         module__num_features=X_train.shape[1],
+        module__num_hidden_first=CONFIG['hidden_units'],
+        module__dropout_rate=CONFIG['dropout'],
         
-        # class_weight = balanced
         criterion=nn.BCEWithLogitsLoss,
-        criterion__pos_weight=pos_weight,
-
+        criterion__pos_weight=final_pos_weight,
+        
         optimizer=optim.AdamW,
-        lr=0.001,
-        max_epochs=20,
-        batch_size=1024,
+        optimizer__lr=CONFIG['lr'],
+        optimizer__weight_decay=CONFIG['weight_decay'],
+        
+        max_epochs=CONFIG['max_epochs'],
+        batch_size=CONFIG['batch_size'],
+        
+        callbacks=[
+            EpochScoring(scoring='roc_auc', lower_is_better=False, name='valid_auc'),
+            cp,
+            load_best,
+            LRScheduler(
+                policy=ReduceLROnPlateau, 
+                monitor='valid_loss', 
+                mode='min', 
+                patience=3, 
+                factor=0.5
+            ),
+            EarlyStopping(monitor='valid_auc', patience=CONFIG['patience'], lower_is_better=False),
+        ],
         
         device='cuda',
+        verbose=1
     )
-    
-    print("Training...")
-    scikit_model.fit(X_train, y_train)
-    joblib.dump(scikit_model, "one_mlp.joblib")
+
+    print(f"Training with: {CONFIG}")
+    net.fit(X_train_tune, y_train_tune)
+    joblib.dump(net, "one_mlp.joblib")
 else:
-    scikit_model = joblib.load("one_mlp.joblib")
+    net = joblib.load("one_mlp.joblib")
 
 # this returns 2 columns, take the one for class 1
-y_proba_nn = scikit_model.predict_proba(X_test)[:, 1]
+y_proba_nn = net.predict_proba(X_test)[:, 1]
 # make sure it's horizontal
 fraud_probs_nn = y_proba_nn.flatten()
 # 3. Find Threshold (Use your existing function!)

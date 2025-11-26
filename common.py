@@ -91,7 +91,6 @@ def print_best_threshold(y_test, fraud_probs):
     print(f"--- F{BETA}-Score Optimization ---")
     # this seems innaccurate
     # print(f"Best F{BETA}-Score: {f_beta_scores[best_score_index]:.4f}")
-    print(f"Optimal Threshold: {best_threshold:.4f}")
 
     y_final_pred = (fraud_probs > best_threshold).astype(int)
 

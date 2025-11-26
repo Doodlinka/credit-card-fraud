@@ -1,0 +1,30 @@
+Random seed set to 61
+Training with: {'lr': 0.002, 'hidden_units': 50, 'dropout': 0.3, 'weight_decay': 0.0001, 'pos_weight_mult': 1.5, 'max_epochs': 50, 'batch_size': 1024, 'patience': 10}
+callbacks=[
+    EpochScoring(scoring='roc_auc', lower_is_better=False, name='valid_auc'),
+    cp,
+    load_best,
+    LRScheduler(
+        policy=ReduceLROnPlateau, 
+        monitor='valid_loss', 
+        mode='min', 
+        patience=3, 
+        factor=0.5
+    ),
+    EarlyStopping(monitor='valid_auc', patience=CONFIG['patience'], lower_is_better=False),
+],
+--- F7.1-Score Optimization ---
+Best F7.1-Score as per the matrix: 0.8710
+--- Classification Report for threshold 0.9703---
+              precision    recall  f1-score   support
+
+         0.0       1.00      1.00      1.00     56864
+         1.0       0.63      0.88      0.74        98
+
+    accuracy                           1.00     56962
+   macro avg       0.82      0.94      0.87     56962
+weighted avg       1.00      1.00      1.00     56962
+
+--- Confusion Matrix ---
+[[56814    50]
+ [   12    86]]
