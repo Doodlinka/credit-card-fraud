@@ -2,3 +2,6 @@
 *.joblib
 __pycache__/*
 config.py
+# they can be hard to recreate, the NN especially
+!miracle-based dart/lgbm_dart_ensemble.joblib
+!one-mlp/mlp-ensemble.joblib
