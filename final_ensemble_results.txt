@@ -2,7 +2,7 @@ GBM Ensemble Predictions:
 
 --- F7.1-Score Optimization ---
 Best F7.1-Score as per the matrix: 0.8844
---- Classification Report for threshold 0.0411---
+--- Classification Report for threshold 0.9979---
               precision    recall  f1-score   support
 
          0.0       1.00      1.00      1.00     56864
@@ -21,7 +21,7 @@ NN Ensemble Predictions:
 
 --- F7.1-Score Optimization ---
 Best F7.1-Score as per the matrix: 0.8725
---- Classification Report for threshold 0.8578---
+--- Classification Report for threshold 0.9957---
               precision    recall  f1-score   support
 
          0.0       1.00      1.00      1.00     56864
@@ -36,20 +36,20 @@ weighted avg       1.00      1.00      1.00     56962
  [   10    88]]
 
 
-Full Ensemble Predictions (0.85 GB, 0.15 NN):
+Full Ensemble Predictions:
 
 --- F7.1-Score Optimization ---
-Best F7.1-Score as per the matrix: 0.8860
---- Classification Report for threshold 14921.4625---
+Best F7.1-Score as per the matrix: 0.8862
+--- Classification Report for threshold 0.9979---
               precision    recall  f1-score   support
 
          0.0       1.00      1.00      1.00     56864
-         1.0       0.81      0.89      0.84        98
+         1.0       0.81      0.89      0.85        98
 
     accuracy                           1.00     56962
-   macro avg       0.90      0.94      0.92     56962
+   macro avg       0.91      0.94      0.92     56962
 weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
-[[56843    21]
+[[56844    20]
  [   11    87]]

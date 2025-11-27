@@ -3,7 +3,7 @@ import numpy as np
 from NN_definition import FraudDetectorModule
 from sklearn.preprocessing import RobustScaler
 from scipy.stats import rankdata
-from sklearn.metrics import precision_recall_curve
+# from sklearn.metrics import precision_recall_curve
 
 print("loading data...")
 X_train, X_test, y_train, y_test = common.load_dataset()
@@ -38,8 +38,8 @@ for model in nn_ensemble:
     nn_fraud_probs.append(y_pred[:, 1])
 nn_consensus = np.average(nn_fraud_probs, axis=0)
 
-rank_gb = rankdata(gb_consensus, axis=0) / len(gb_fraud_probs)
-rank_nn = rankdata(nn_consensus, axis=0) / len(nn_fraud_probs)
+rank_gb = rankdata(gb_consensus, axis=0) / len(gb_consensus)
+rank_nn = rankdata(nn_consensus, axis=0) / len(nn_consensus)
 hybrid_ranks = (0.85 * rank_gb + 0.15 * rank_nn) # 0.8860 - misses that one case, unfortunately
 # hybrid_ranks = np.maximum(rank_gb, rank_nn) # 0.8725 - precision suffers
 
@@ -53,9 +53,9 @@ hybrid_ranks = (0.85 * rank_gb + 0.15 * rank_nn) # 0.8860 - misses that one case
 # common.only_print_report(final_pred, y_test, 0)
 
 print("\n\nGBM Ensemble Predictions:\n")
-common.print_best_threshold(y_test, gb_consensus)
+common.print_best_threshold(y_test, rank_gb)
 print("\n\nNN Ensemble Predictions:\n")
-common.print_best_threshold(y_test, nn_consensus)
+common.print_best_threshold(y_test, rank_nn)
 print("\n\nFull Ensemble Predictions:\n")
 common.print_best_threshold(y_test, hybrid_ranks)
 
