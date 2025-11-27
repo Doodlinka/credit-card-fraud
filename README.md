@@ -8,7 +8,8 @@
 
 ## Logistic Regression - 0.8511
 Взагалі не оптимізована, це базовий варіант.
-```--- F7.1-Score Optimization ---
+```
+--- F7.1-Score Optimization ---
 Optimal Threshold: 0.9839
 Best F7.1-Score as per the matrix: 0.8511
 --- Classification Report for threshold 0.9839---  
@@ -23,11 +24,13 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56814    50]
- [   14    84]]```
+ [   14    84]]
+```
 
 ## Random Forest - 0.8753
 Теж не підкручувала, просто на пробу. Тим не менш має один із найкращих результатів.
-```--- F7.1-Score Optimization ---
+```
+--- F7.1-Score Optimization ---
 Optimal Threshold: 0.0700
 Best F7.1-Score as per the matrix: 0.875293
 --- Classification Report for threshold 0.0700---  
@@ -42,10 +45,12 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56839    25]
- [   12    86]]```
+ [   12    86]]
+```
 
 Схоже, я ще пробувала об'єднувати їх в ансамбль, але результат вийшов гірший - 0.8746.
-```(4 models)
+```
+(4 models)
 --- F7.1-Score Optimization ---
 Optimal Threshold: 0.0700
 Best F7.1-Score as per the matrix: 0.8746
@@ -61,11 +66,13 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56835    29]
- [   12    86]]```
+ [   12    86]]
+```
 
 ## Gradient Boosting (LightGBM) - 0.8844
-Це перша модель, яку я всерйоз підкурчувала. Дала сама по собі мало не найкращий рещультат, але не пропорційний кількості зусиль. Результати індивідуальних моделей не зберіглись, бо вони були гірші. (Лежить ще якийсь ансамбль в miracle, але воно старе і гірше.)
-```THIS RESULT USES np.max INSTEAD OF np.mean TO CONSOLIDATE THE ENSEMBLE SCORES
+Це перша модель, яку я всерйоз підкурчувала. Дала сама по собі мало не найкращий рещультат, але не пропорційний кількості зусиль. Результати індивідуальних моделей не зберіглись, бо вони були гірші.
+```
+THIS RESULT USES np.max INSTEAD OF np.mean TO CONSOLIDATE THE ENSEMBLE SCORES
 Loaded ensemble of 4 models with following params:           
 {'boosting_type': 'dart', 'class_weight': 'balanced', 'colsample_bytree': 1.0, 'importance_type': 'split', 'learning_rate': 0.1, 'max_depth': -1, 'min_child_samples': 20, 'min_child_weight': 0.001, 'min_split_gain': 0.0, 'n_estimators': 600, 'n_jobs': None, 'num_leaves': 31, 'objective': None, 'random_state': 61, 'reg_alpha': 0.0, 'reg_lambda': 0.0, 'subsample': 1.0, 'subsample_for_bin': 200000, 'subsample_freq': 0, 'force_col_wise': True}
 --- F7.1-Score Optimization ---
@@ -83,11 +90,13 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56834    30]
- [   11    87]]```
+ [   11    87]]
+```
 
 ## Multi-layer Perceptron - 0.8733
 Я трошки встигла попідкручувати, але не сильно, бо там складно і довго і результатів силььно не було. Стабільності не досягла, просто отримала якісь три чудо-моделі, привожу тут найкращу.
-```CONFIG = {
+```
+CONFIG = {
      'lr': 0.0005,             
      'hidden_units': 60,      
      'dropout': 0.3,       
@@ -110,10 +119,12 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56712   152]
- [   10    88]]```
+ [   10    88]]
+```
 
 Тут теж робила ансамбль з усіх трьох (ймовірності об'єднані за допомогою np.average), але він дав трохи гірші результати (хоча напевно він більш стабільний).
-```--- F7.1-Score Optimization ---
+```
+--- F7.1-Score Optimization ---
 Best F7.1-Score as per the matrix: 0.8725
 --- Classification Report for threshold 0.8578---
               precision    recall  f1-score   support
@@ -127,11 +138,13 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56707   157]
- [   10    88]]```
+ [   10    88]]
+```
 
 ## Final combination of GB and NN examples - 0.8862
 Врешті-решт найкращий результат вийшов, коли я об'єднала ймовірності ансамблів GB та NN з коефіцієнтами 0.85 та 0.15.
-```--- F7.1-Score Optimization ---
+```
+--- F7.1-Score Optimization ---
 Best F7.1-Score as per the matrix: 0.8862
 --- Classification Report for threshold 0.9979---
               precision    recall  f1-score   support
@@ -145,4 +158,5 @@ weighted avg       1.00      1.00      1.00     56962
 
 --- Confusion Matrix ---
 [[56844    20]
- [   11    87]]```
+ [   11    87]]
+```
