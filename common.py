@@ -75,8 +75,8 @@ def crossvalidate(model_constructor, X_train, y_train, static_parameters, tuned_
     print(f"Average optimal tree count: {avg_trees:.0f}")
     return ensemble
     
-
-def print_best_threshold(y_test, fraud_probs):
+    
+def get_best_threshold_and_score(y_test, fraud_probs):
     precisions, recalls, thresholds = precision_recall_curve(y_test, fraud_probs)
     # there's a phantom point at the end, apparently
     precisions, recalls = precisions[:-1], recalls[:-1]
@@ -87,13 +87,11 @@ def print_best_threshold(y_test, fraud_probs):
 
     best_score_index = np.argmax(f_beta_scores)
     best_threshold = thresholds[best_score_index]
+    # f_beta_scores[best_score_index] seems innaccurate, but hoopefully it's fine for estimates
+    return best_threshold, f_beta_scores[best_score_index]
 
+def only_print_report(y_final_pred, y_test, best_threshold):
     print(f"--- F{BETA}-Score Optimization ---")
-    # this seems innaccurate
-    # print(f"Best F{BETA}-Score: {f_beta_scores[best_score_index]:.4f}")
-
-    y_final_pred = (fraud_probs > best_threshold).astype(int)
-
     crdict = classification_report(y_test, y_final_pred, output_dict=True)
     one = "1" if "1" in crdict else "1.0"
     fb = (1 + BETA**2) * (crdict[one]["precision"] * crdict[one]["recall"]) / ((BETA**2 * crdict[one]["precision"]) + crdict[one]["recall"] + 1e-10)
@@ -104,3 +102,9 @@ def print_best_threshold(y_test, fraud_probs):
 
     print("--- Confusion Matrix ---")
     print(confusion_matrix(y_test, y_final_pred))
+
+def print_best_threshold(y_test, fraud_probs):
+    best_threshold, _ = get_best_threshold_and_score(y_test, fraud_probs)
+    y_final_pred = (fraud_probs > best_threshold).astype(int)
+    only_print_report(y_final_pred, y_test, best_threshold)
+    

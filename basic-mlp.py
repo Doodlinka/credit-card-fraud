@@ -39,20 +39,12 @@ def set_seed(seed=config.TRAIN_SEED):
 # for consistency's sake
 set_seed()
 
-
-df = pd.read_csv("v132_creditcard.csv")
-
-X = df.drop("Class", axis=1)
-y = df["Class"]
+X_train, X_test, y_train, y_test = common.load_dataset()
 
 scaler = RobustScaler()
 columns_to_scale = ['Time', 'Amount']
-X[columns_to_scale] = scaler.fit_transform(X[columns_to_scale])
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, 
-    test_size=0.2, 
-    random_state=config.TT_SPLIT_SEED)
+X_train = scaler.fit_transform(X_train[columns_to_scale])
+X_test = scaler.transform(X_test[columns_to_scale])
 
 X_train = X_train.to_numpy().astype(np.float32)
 X_test = X_test.to_numpy().astype(np.float32)
